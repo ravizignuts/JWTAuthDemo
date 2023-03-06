@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function(){
             Route::post('register', 'register');
             Route::post('login', 'login');
             Route::get('profile', 'profile');
-            Route::get('token-refresh', 'tokenRefresh');
+            Route::post('token-refresh', 'tokenRefresh');
             Route::get('logout', 'logout');
         });
     });

@@ -45,39 +45,42 @@ class UserController extends Controller
                 'Error'   => $validator->errors()
             ]);
         }
-        $token = auth()->attempt($validator->validate());
-        dd($token);
-        // if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-        //     /** @var \App\Model\User $user */
-        //     $user = Auth::user();
-        //     $success['token'] = $user->createToken('MyAPP')->accessToken;
-        //     return response()->json([
-        //         'success' => true,
-        //         'user'    => $user['name'],
-        //         'token'   => $success
-        //     ]);
-        // } else {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => "User Credentials are Invalid"
-        //     ]);
-        // }
+        if(! $token = auth()->attempt($validator->validate())){
+            return response()->json([
+                'error' => 'Invalid Credentials'
+            ]);
+        }
+        return $this->respondWithToken($token);
+    }
+    protected function respondWithToken($token){
+        return response()->json([
+            'access_token' => $token,
+            'token_type'   => 'bearer',
+            'expires_in'   => auth()->factory()->getTTL()*60
+        ]);
     }
     /**
      * API FOR User Profile
-     * @param Request $request
      * @return json Data
      */
     public function profile(){
-
+        $user = auth()->user();
+        if($user){
+            return response()->json([
+                auth()->user()
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'User Unauthorized'
+            ]);
+        }
     }
     /**
      * API FOR User Token Refresh
-     * @param Request $request
      * @return json Data
      */
     public function tokenRefresh(){
-
+        return $this->respondWithToken(auth()->refresh());
     }
     /**
      * API FOR Logout User
@@ -85,12 +88,18 @@ class UserController extends Controller
      * @return json Data
      */
     public function logout(){
-        /** @var \App\Model\User $user */
-        $user = Auth::user()->token();
-        $user->revoke();
-        return response()->json([
-            'user'    => $user,
-            'message' => 'User Logout'
-        ]);
+        $user = auth()->user();
+        if($user){
+            auth()->logout();
+            return response()->json([
+                'user'    =>  $user,
+                'message' => 'User Successfully Logout'
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Unauthorized'
+            ]);
+        }
+
     }
 }
