@@ -1,14 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\V1;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api',['except' => ['login','register']]);
+    // }//Second Method to apply middleware
+
     /**
      * API FOR Register User
      * @param Request $request
